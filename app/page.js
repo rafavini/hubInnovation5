@@ -1,147 +1,53 @@
-// app/page.js
 "use client"
-import { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { VerificaLogin } from "./Controller/loginController";
 
-export default function HomePage() {
-    const [users, setUsers] = useState([]);
-    const [name, setName] = useState('');
-    const [age, setAge] = useState('');
-    const [editingUser, setEditingUser] = useState(null);
+export default function LoginPage() {
+    const [usuario, setUsuario] = useState("")
+    const [senha, setSenha] = useState("")
+    const router = useRouter()
 
-    // Função para buscar todos os usuários
-    const fetchUsers = async () => {
-        try {
-            const response = await fetch('/api/users');
-            const data = await response.json();
-            setUsers(data);
-        } catch (error) {
-            console.error('Erro ao buscar usuários:', error);
+
+    async function handleSubmit(event) {
+        event.preventDefault()
+        const response = await VerificaLogin(usuario,senha)
+        if(response){
+            router.push("/home")
         }
-    };
-
-    // Função para adicionar um novo usuário
-    const addUser = async () => {
-        try {
-            const response = await fetch('/api/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name, age: parseInt(age, 10) }),
-            });
-            if (response.ok) {
-                setName('');
-                setAge('');
-                fetchUsers();
-            }
-        } catch (error) {
-            console.error('Erro ao adicionar usuário:', error);
-        }
-    };
-
-    // Função para atualizar um usuário
-    const updateUser = async () => {
-        try {
-            const response = await fetch('/api/users', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: editingUser.id, name, age: parseInt(age, 10) }),
-            });
-            if (response.ok) {
-                setName('');
-                setAge('');
-                setEditingUser(null);
-                fetchUsers();
-            }
-        } catch (error) {
-            console.error('Erro ao atualizar usuário:', error);
-        }
-    };
-
-    // Função para deletar um usuário
-    const deleteUser = async (id) => {
-        try {
-            const response = await fetch('/api/users', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id }),
-            });
-            if (response.ok) {
-                fetchUsers();
-            }
-        } catch (error) {
-            console.error('Erro ao deletar usuário:', error);
-        }
-    };
-
-    // Lida com o envio do formulário (adicionar ou atualizar)
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (editingUser) {
-            updateUser();
-        } else {
-            addUser();
-        }
-    };
-
-    // Preenche os campos para edição
-    const handleEdit = (user) => {
-        setEditingUser(user);
-        setName(user.name);
-        setAge(user.age.toString());
-    };
-
-    // Carrega os usuários na inicialização
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+    }
 
     return (
-        <div>
-            <h1>Gerenciamento de Usuários</h1>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Nome"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
-                <input
-                    type="number"
-                    placeholder="Idade"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    required
-                />
-                <button type="submit">{editingUser ? 'Atualizar' : 'Adicionar'} Usuário</button>
-                {editingUser && (
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setEditingUser(null);
-                            setName('');
-                            setAge('');
-                        }}
-                    >
-                        Cancelar Edição
-                    </button>
-                )}
-            </form>
-
-            <ul>
-                {users.map((user) => (
-                    <li key={user.id}>
-                        {user.name} - {user.age} anos
-                        <button onClick={() => handleEdit(user)}>Editar</button>
-                        <button onClick={() => deleteUser(user.id)}>Excluir</button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <>
+            <div className="flex items-center justify-center w-full h-screen">
+                <div className="w-80 bg-slate-600 p-6 rounded-lg shadow-md">
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="form-control">
+                            <label className="block text-white mb-1">Usuário</label>
+                            <input
+                                type="text"
+                                placeholder="Digite o usuário"
+                                className="w-full px-3 py-2 bg-gray-200 rounded  "
+                                onChange={(e) => setUsuario(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-control">
+                            <label className="block text-white mb-1">Senha</label>
+                            <input
+                                type="password"
+                                placeholder="Digite a senha"
+                                className="w-full px-3 py-2 bg-gray-200 rounded"
+                                onChange={(e) => setSenha(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 "
+                        >
+                            Entrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </>
     );
 }

@@ -5,10 +5,14 @@ CREATE TABLE USERS
     age INTEGER
 )
 
+
+
+
+
 INSERT INTO users(name, age) 
 VALUES
 ("rafael", 22),
 ("Niklas", 22)
 
-
-drop table users
+select * from USERS;
+drop table USERS;

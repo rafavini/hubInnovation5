@@ -5,7 +5,7 @@ const createTable = () => {
         CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            age INTEGER
+            password TEXT NOT NULL
         )
     `
     db.prepare(sql).run()
